@@ -11,4 +11,16 @@ public class RecipesController(AppDbContext dbContext) : Controller
         List<Recipe> recipes = await dbContext.Recipes.OrderBy(recipe => recipe.Name).ToListAsync();
         return View(recipes);
     }
+
+    [HttpGet]
+    public IActionResult Create() => View();
+
+
+    [HttpPost]
+    public async Task<IActionResult> Create(Recipe recipe)
+    {
+        dbContext.Recipes.Add(recipe);
+        await dbContext.SaveChangesAsync();
+        return RedirectToAction(nameof(Index));
+    }
 }
