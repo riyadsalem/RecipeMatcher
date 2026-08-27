@@ -25,3 +25,4 @@ app.MapControllerRoute(
     pattern: "{controller=Recipes}/{action=Index}/{id?}");
 
 app.Run();
+public partial class Program;
