@@ -1,2 +1,8 @@
+@model IReadOnlyList<Recipe>
 <h1>Recipes</h1>
-<p>Find something tasty.</p>
+<ul>
+    @foreach (Recipe recipe in Model)
+    {
+        <li>@recipe.Name, @recipe.PreparationMinutes minutes</li>
+    }
+</ul>
