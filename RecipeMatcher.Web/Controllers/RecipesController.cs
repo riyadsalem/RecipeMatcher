@@ -24,4 +24,12 @@ public class RecipesController(AppDbContext dbContext) : Controller
         await dbContext.SaveChangesAsync();
         return RedirectToAction(nameof(Index));
     }
+
+    public async Task<IActionResult> Details(int id)
+    {
+        Recipe? recipe = await dbContext.Recipes.FindAsync(id);
+        return recipe is null ? NotFound() : View(recipe);
+    }
+
+
 }

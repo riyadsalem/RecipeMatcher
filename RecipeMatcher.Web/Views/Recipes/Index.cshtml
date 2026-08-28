@@ -3,6 +3,8 @@
 <ul>
     @foreach (Recipe recipe in Model)
     {
-        <li>@recipe.Name, @recipe.PreparationMinutes minutes</li>
+        <li>@recipe.Name, @recipe.PreparationMinutes minutes
+            <a asp-action="Details" asp-route-id="@recipe.Id">Details</a>
+        </li>
     }
 </ul>
