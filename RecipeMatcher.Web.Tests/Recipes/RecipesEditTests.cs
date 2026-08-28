@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using RecipeMatcher.Web.Data;
 using RecipeMatcher.Web.Models;
 
-namespace RecipeMatcher.Web.Tests;
+namespace RecipeMatcher.Web.Tests.Recipes;
 
 public class RecipesEditTests(CustomWebApplicationFactory factory) : IClassFixture<CustomWebApplicationFactory>
 {

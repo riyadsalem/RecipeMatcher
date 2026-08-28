@@ -1,0 +1,6 @@
+@model Ingredient
+<h1>Delete @Model.Name?</h1>
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="Id" />
+    <button type="submit">Delete</button>
+</form>

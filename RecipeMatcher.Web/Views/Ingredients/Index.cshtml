@@ -1,0 +1,12 @@
+@model IReadOnlyList<Ingredient>
+<h1>Ingredients</h1>
+<a asp-action="Create">Create new</a>
+<ul>
+    @foreach (Ingredient ingredient in Model)
+    {
+        <li>@ingredient.Name
+            <a asp-action="Edit" asp-route-id="@ingredient.Id">Edit</a>
+            <a asp-action="Delete" asp-route-id="@ingredient.Id">Delete</a>
+        </li>
+    }
+</ul>

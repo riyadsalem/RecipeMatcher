@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using RecipeMatcher.Web.Data;
 
-namespace RecipeMatcher.Web.Tests;
+namespace RecipeMatcher.Web.Tests.Recipes;
 
 public class RecipesCreateValidationTests(CustomWebApplicationFactory factory) : IClassFixture<CustomWebApplicationFactory>
 // Integration Test >>> Arrange (DB, CLIENT & FORM) -> Act (POST) -> Assert
