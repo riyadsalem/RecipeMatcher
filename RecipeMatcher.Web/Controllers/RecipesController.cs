@@ -31,5 +31,26 @@ public class RecipesController(AppDbContext dbContext) : Controller
         return recipe is null ? NotFound() : View(recipe);
     }
 
+    [HttpGet]
+    public async Task<IActionResult> Edit(int id)
+    {
+        Recipe? recipe = await dbContext.Recipes.FindAsync(id);
+        return recipe is null ? NotFound() : View(recipe);
+    }
 
+    [HttpPost]
+    public async Task<IActionResult> Edit(int id, Recipe recipe)
+    {
+        if (id != recipe.Id) return NotFound();
+        if (!ModelState.IsValid) return View(recipe);
+
+        Recipe? existingRecipe = await dbContext.Recipes.FindAsync(id);
+        if (existingRecipe is null) return NotFound();
+
+        existingRecipe.Name = recipe.Name;
+        existingRecipe.PreparationMinutes = recipe.PreparationMinutes;
+        await dbContext.SaveChangesAsync();
+
+        return RedirectToAction(nameof(Index));
+    }
 }

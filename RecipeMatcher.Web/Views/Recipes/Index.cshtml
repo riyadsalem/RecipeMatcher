@@ -5,6 +5,7 @@
     {
         <li>@recipe.Name, @recipe.PreparationMinutes minutes
             <a asp-action="Details" asp-route-id="@recipe.Id">Details</a>
+            <a asp-action="Edit" asp-route-id="@recipe.Id">Edit</a>
         </li>
     }
 </ul>
