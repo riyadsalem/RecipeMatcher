@@ -16,6 +16,25 @@ namespace RecipeMatcher.Web.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.30");
 
+            modelBuilder.Entity("RecipeMatcher.Web.Models.Ingredient", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Ingredients");
+                });
+
             modelBuilder.Entity("RecipeMatcher.Web.Models.Recipe", b =>
                 {
                     b.Property<int>("Id")

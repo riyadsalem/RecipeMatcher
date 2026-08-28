@@ -10,7 +10,7 @@ using RecipeMatcher.Web.Data;
 namespace RecipeMatcher.Web.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260828111232_AddIngredients")]
+    [Migration("20260828122551_AddIngredients")]
     partial class AddIngredients
     {
         /// <inheritdoc />
@@ -18,6 +18,25 @@ namespace RecipeMatcher.Web.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.30");
+
+            modelBuilder.Entity("RecipeMatcher.Web.Models.Ingredient", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Ingredients");
+                });
 
             modelBuilder.Entity("RecipeMatcher.Web.Models.Recipe", b =>
                 {
