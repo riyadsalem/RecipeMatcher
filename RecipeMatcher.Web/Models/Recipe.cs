@@ -10,4 +10,5 @@ public class Recipe
     public string Name { get; set; } = "";
     [Range(1, 480)]
     public int PreparationMinutes { get; set; }
+    public ICollection<RecipeIngredient> RecipeIngredients { get; set; } = [];
 }
