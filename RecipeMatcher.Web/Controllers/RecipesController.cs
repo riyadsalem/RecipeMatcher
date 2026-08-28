@@ -53,4 +53,24 @@ public class RecipesController(AppDbContext dbContext) : Controller
 
         return RedirectToAction(nameof(Index));
     }
+
+    [HttpGet]
+    public async Task<IActionResult> Delete(int id)
+    {
+        Recipe? recipe = await dbContext.Recipes.FindAsync(id);
+        return recipe is null ? NotFound() : View(recipe);
+    }
+
+    [HttpPost]
+    [ActionName("Delete")]
+    public async Task<IActionResult> DeleteConfirmed(int id)
+    {
+        Recipe? recipe = await dbContext.Recipes.FindAsync(id);
+        if (recipe is null) return NotFound();
+        dbContext.Recipes.Remove(recipe);
+        await dbContext.SaveChangesAsync();
+        return RedirectToAction(nameof(Index));
+    }
+
+
 }
