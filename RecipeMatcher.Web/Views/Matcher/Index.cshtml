@@ -1,0 +1,23 @@
+@model PantryViewModel
+<h1>Pantry</h1>
+<form asp-action="Index" method="post">
+    @foreach (IngredientOptionViewModel ingredient in Model.Ingredients)
+    {
+        <label>
+            <input type="checkbox" name="ingredientIds" value="@ingredient.Id" @(ingredient.Selected ? "checked" : "") />
+            @ingredient.Name
+        </label>
+    }
+    <button type="submit">Select</button>
+</form>
+
+@if (Model.SelectedIngredientIds.Count > 0)
+{
+    <h2>Selected ids</h2>
+    <ul>
+        @foreach (int id in Model.SelectedIngredientIds)
+        {
+            <li>@id</li>
+        }
+    </ul>
+}
