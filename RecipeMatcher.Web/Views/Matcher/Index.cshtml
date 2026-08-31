@@ -8,16 +8,30 @@
             @ingredient.Name
         </label>
     }
-    <button type="submit">Select</button>
+    <button type="submit">Find recipes</button>
 </form>
 
-@if (Model.SelectedIngredientIds.Count > 0)
+@if (Model.MatchedRecipes.Count > 0)
 {
-    <h2>Selected ids</h2>
+    <h2>Matching recipes</h2>
     <ul>
-        @foreach (int id in Model.SelectedIngredientIds)
+        @foreach (MatchedRecipeViewModel recipe in Model.MatchedRecipes)
         {
-            <li>@id</li>
+            <li>
+                @recipe.Name (@recipe.PreparationMinutes minutes)
+                <ul>
+                    @foreach (string ingredientName in recipe.IngredientNames)
+                    {
+                        <li>@ingredientName</li>
+                    }
+                </ul>
+            </li>
         }
     </ul>
 }
+else
+{
+    <p>Er zijn geen recepten die dit ingredient bevatten <span
+        style="border: 2px solid black; padding: 3px; background: #cfd">Kies een verborgen
+        ingredient</span></p>
+    }
