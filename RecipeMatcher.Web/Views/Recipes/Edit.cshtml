@@ -1,4 +1,4 @@
-@model Recipe
+@model EditRecipeViewModel
 <form asp-action="Edit" method="post">
     <input type="hidden" asp-for="Id" />
     <div asp-validation-summary="ModelOnly"></div>
@@ -8,6 +8,15 @@
     <label asp-for="PreparationMinutes"></label>
     <input asp-for="PreparationMinutes" />
     <span asp-validation-for="PreparationMinutes"></span>
+    <h2>Ingredients</h2>
+    @foreach (IngredientOptionViewModel ingredient in Model.Ingredients)
+    {
+        <label>
+            <input type="checkbox" name="ingredientIds" value="@ingredient.Id" @(ingredient.Selected ? "checked" : "") />
+            @ingredient.Name
+        </label>
+    }
+
     <button type="submit">Save</button>
 </form>
 

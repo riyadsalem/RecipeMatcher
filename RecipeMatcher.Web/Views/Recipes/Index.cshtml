@@ -1,5 +1,7 @@
 @model IReadOnlyList<Recipe>
 <h1>Recipes</h1>
+<a asp-action="Create">Create Recipe</a>
+
 <ul>
     @foreach (Recipe recipe in Model)
     {

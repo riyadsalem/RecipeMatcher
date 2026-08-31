@@ -67,4 +67,42 @@ public class RecipesEditTests(CustomWebApplicationFactory factory) : IClassFixtu
         Recipe? unchanged = await dbContext.Recipes.FindAsync(recipe.Id);
         Assert.Equal("Chicken and rice", unchanged!.Name);
     }
+
+    [Fact]
+    public async Task Get_Edit_MarksLinkedIngredient_AsSelected()
+    {
+        var scope = factory.Services.CreateScope();
+        AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        await dbContext.Database.EnsureCreatedAsync();
+
+        Recipe recipe = new()
+        {
+            Name = "Soup",
+            PreparationMinutes = 20
+        };
+
+        Ingredient ingredient = new()
+        {
+            Name = "Carrot"
+        };
+
+        dbContext.Recipes.Add(recipe);
+        dbContext.Ingredients.Add(ingredient);
+        await dbContext.SaveChangesAsync();
+
+        dbContext.RecipeIngredients.Add(new RecipeIngredient
+        {
+            RecipeId = recipe.Id,
+            IngredientId = ingredient.Id
+        });
+        await dbContext.SaveChangesAsync();
+
+        var client = factory.CreateClient();
+        var response = await client.GetAsync($"/recipes/edit/{recipe.Id}");
+        string content = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Contains("Carrot", content);
+        Assert.Contains("checked", content);
+    }
 }
