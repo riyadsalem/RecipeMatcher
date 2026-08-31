@@ -41,19 +41,25 @@ public class MatcherController(AppDbContext dbContext) : Controller
 
     private async Task<IReadOnlyList<MatchedRecipeViewModel>> FindMatchingRecipesAsync(int[] ingredientIds)
     => await dbContext.Recipes
-            .Where(recipe => recipe.RecipeIngredients
-                .All(r => ingredientIds.Contains(r.IngredientId)))
-            .OrderBy(recipe => recipe.Name)
             .Select(recipe => new MatchedRecipeViewModel
             {
                 Id = recipe.Id,
                 Name = recipe.Name,
                 PreparationMinutes = recipe.PreparationMinutes,
+
                 IngredientNames = recipe.RecipeIngredients
-                    .Select(r => r.Ingredient.Name)
-                    .ToList()
+                    .Select(ri => ri.Ingredient.Name)
+                    .ToList(),
+
+                MissingIngredients = recipe.RecipeIngredients
+                    .Where(ri => !ingredientIds.Contains(ri.IngredientId))
+                    .Select(ri => ri.Ingredient.Name)
+                    .ToList(),
+
+                MissingCount = recipe.RecipeIngredients
+                    .Count(ri => !ingredientIds.Contains(ri.IngredientId))
             })
+            .OrderBy(recipe => recipe.MissingCount)
+            .ThenBy(recipe => recipe.Name)
             .ToListAsync();
-
-
 }

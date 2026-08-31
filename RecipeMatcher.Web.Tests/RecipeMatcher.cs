@@ -34,16 +34,15 @@ public class MatcherTests(CustomWebApplicationFactory factory) : IClassFixture<C
     }
 
     [Fact]
-    public async Task Post_Matcher_ReturnsOnlyFullMatches()
+    public async Task Post_Matcher_SortsFullMatchesBeforeNearMatches()
     {
-        var scope = factory.Services.CreateScope();
-        AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        await dbContext.Database.EnsureCreatedAsync();
-
         int eggId = await SeedIngredientAsync("Egg");
         int milkId = await SeedIngredientAsync("Milk");
         int flourId = await SeedIngredientAsync("Flour");
         int butterId = await SeedIngredientAsync("Butter");
+
+        var scope = factory.Services.CreateScope();
+        AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
         Recipe pancakes = new()
         {
@@ -86,7 +85,6 @@ public class MatcherTests(CustomWebApplicationFactory factory) : IClassFixture<C
                 IngredientId = butterId
             });
         await dbContext.SaveChangesAsync();
-
         var client = factory.CreateClient();
         var formData = new FormUrlEncodedContent(
             [
@@ -99,15 +97,18 @@ public class MatcherTests(CustomWebApplicationFactory factory) : IClassFixture<C
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Contains("Pancakes", content); //.Where(recipe => recipe.RecipeIngredients.All(r => ingredientIds.Contains(r.IngredientId))) => IN MatcherController
-        Assert.DoesNotContain("Cake", content);
+        Assert.Contains("Cake", content);
+        Assert.Contains("You have everything.", content);
+        Assert.Contains("Missing:", content);
     }
 
     [Fact]
-    public async Task Post_Matcher_RecipeWithNoIngredients_IsAlwaysAMatch()
+    public async Task Post_Matcher_RecipeWithNoIngredients_ShowsNoIngredientsMessage()
     {
         var scope = factory.Services.CreateScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         await dbContext.Database.EnsureCreatedAsync();
+
         Recipe recipe = new()
         {
             Name = "Toast",
@@ -122,5 +123,6 @@ public class MatcherTests(CustomWebApplicationFactory factory) : IClassFixture<C
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Contains("Toast", content);
+        Assert.Contains("No ingredients listed yet.", content);
     }
 }

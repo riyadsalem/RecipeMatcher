@@ -13,18 +13,31 @@
 
 @if (Model.MatchedRecipes.Count > 0)
 {
-    <h2>Matching recipes</h2>
+    <h2>Recipes</h2>
     <ul>
         @foreach (MatchedRecipeViewModel recipe in Model.MatchedRecipes)
         {
             <li>
                 @recipe.Name (@recipe.PreparationMinutes minutes)
-                <ul>
-                    @foreach (string ingredientName in recipe.IngredientNames)
-                    {
-                        <li>@ingredientName</li>
-                    }
-                </ul>
+                @if (recipe.IngredientNames.Count == 0)
+                {
+                    <p>No ingredients listed yet.</p>
+                }
+                else if (recipe.MissingCount == 0)
+                {
+                    <p>You have everything.</p>
+                }
+                else
+                {
+                    <p>Missing:</p>
+                    <ul>
+                        @foreach (string ingredient in recipe.MissingIngredients)
+                        {
+                            <li>@ingredient</li>
+                        }
+                    </ul>
+                }
+
             </li>
         }
     </ul>
