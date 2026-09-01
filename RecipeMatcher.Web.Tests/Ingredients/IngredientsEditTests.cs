@@ -5,14 +5,13 @@ using RecipeMatcher.Web.Models;
 
 namespace RecipeMatcher.Web.Tests.Ingredients;
 
-public class IngredientsEditTests(CustomWebApplicationFactory factory) : IClassFixture<CustomWebApplicationFactory>
+public class IngredientsEditTests(CustomWebApplicationFactory factory) : IntegrationTestBase(factory)
 // Zoals (RecipesTests files)
 {
     private async Task<Ingredient> CreateIngredientAsync()
     {
-        var scope = factory.Services.CreateScope();
+        var scope = Factory.Services.CreateScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        await dbContext.Database.EnsureCreatedAsync();
         Ingredient ingredient = new()
         {
             Name = "Pepper"
@@ -26,7 +25,7 @@ public class IngredientsEditTests(CustomWebApplicationFactory factory) : IClassF
     public async Task Get_Edit_ReturnsCorrectResult()
     {
         Ingredient ingredient = await CreateIngredientAsync();
-        var client = factory.CreateClient();
+        var client = Factory.CreateClient();
 
         var response = await client.GetAsync($"/ingredients/edit/{ingredient.Id}");
         string content = await response.Content.ReadAsStringAsync();
@@ -41,7 +40,7 @@ public class IngredientsEditTests(CustomWebApplicationFactory factory) : IClassF
     public async Task Post_Edit_HandlesValidAndInvalidData()
     {
         Ingredient ingredient = await CreateIngredientAsync();
-        var client = factory.CreateClient();
+        var client = Factory.CreateClient();
         FormUrlEncodedContent formData = new(new Dictionary<string, string>
         {
             ["Id"] = ingredient.Id.ToString(),
@@ -49,7 +48,7 @@ public class IngredientsEditTests(CustomWebApplicationFactory factory) : IClassF
         });
         await client.PostAsync($"/ingredients/edit/{ingredient.Id}", formData);
 
-        var scope = factory.Services.CreateScope();
+        var scope = Factory.Services.CreateScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         Ingredient? updated = await dbContext.Ingredients.FindAsync(ingredient.Id);
         Assert.Equal("Black Pepper", updated!.Name);

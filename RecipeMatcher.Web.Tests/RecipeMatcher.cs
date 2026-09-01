@@ -5,13 +5,12 @@ using RecipeMatcher.Web.Data;
 using RecipeMatcher.Web.Models;
 namespace RecipeMatcher.Web.Tests;
 
-public class MatcherTests(CustomWebApplicationFactory factory) : IClassFixture<CustomWebApplicationFactory>
+public class MatcherTests(CustomWebApplicationFactory factory) : IntegrationTestBase(factory)
 {
     private async Task<int> SeedIngredientAsync(string name)
     {
-        var scope = factory.Services.CreateScope();
+        var scope = Factory.Services.CreateScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        await dbContext.Database.EnsureCreatedAsync();
         Ingredient? ingredient = await dbContext.Ingredients.FirstOrDefaultAsync(i => i.Name == name);
         if (ingredient == null)
         {
@@ -26,7 +25,7 @@ public class MatcherTests(CustomWebApplicationFactory factory) : IClassFixture<C
     public async Task Get_Matcher_ShowsAllIngredients()
     {
         await SeedIngredientAsync("Flour");
-        var client = factory.CreateClient();
+        var client = Factory.CreateClient();
         var response = await client.GetAsync("/matcher");
         string content = await response.Content.ReadAsStringAsync();
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -41,7 +40,7 @@ public class MatcherTests(CustomWebApplicationFactory factory) : IClassFixture<C
         int flourId = await SeedIngredientAsync("Flour");
         int butterId = await SeedIngredientAsync("Butter");
 
-        var scope = factory.Services.CreateScope();
+        var scope = Factory.Services.CreateScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
         Recipe pancakes = new()
@@ -85,7 +84,7 @@ public class MatcherTests(CustomWebApplicationFactory factory) : IClassFixture<C
                 IngredientId = butterId
             });
         await dbContext.SaveChangesAsync();
-        var client = factory.CreateClient();
+        var client = Factory.CreateClient();
         var formData = new FormUrlEncodedContent(
             [
                 new("ingredientIds", eggId.ToString()),
@@ -96,7 +95,7 @@ public class MatcherTests(CustomWebApplicationFactory factory) : IClassFixture<C
         string content = await response.Content.ReadAsStringAsync();
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Assert.Contains("Pancakes", content); //.Where(recipe => recipe.RecipeIngredients.All(r => ingredientIds.Contains(r.IngredientId))) => IN MatcherController
+        Assert.Contains("Pancakes", content);
         Assert.Contains("Cake", content);
         Assert.Contains("You have everything.", content);
         Assert.Contains("Missing:", content);
@@ -105,9 +104,8 @@ public class MatcherTests(CustomWebApplicationFactory factory) : IClassFixture<C
     [Fact]
     public async Task Post_Matcher_RecipeWithNoIngredients_ShowsNoIngredientsMessage()
     {
-        var scope = factory.Services.CreateScope();
+        var scope = Factory.Services.CreateScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        await dbContext.Database.EnsureCreatedAsync();
 
         Recipe recipe = new()
         {
@@ -117,7 +115,7 @@ public class MatcherTests(CustomWebApplicationFactory factory) : IClassFixture<C
         dbContext.Recipes.Add(recipe);
         await dbContext.SaveChangesAsync();
 
-        var client = factory.CreateClient();
+        var client = Factory.CreateClient();
         var response = await client.PostAsync("/matcher", new FormUrlEncodedContent([]));
         string content = await response.Content.ReadAsStringAsync();
 

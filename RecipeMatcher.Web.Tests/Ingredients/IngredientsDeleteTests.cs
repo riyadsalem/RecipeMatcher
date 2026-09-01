@@ -5,14 +5,13 @@ using RecipeMatcher.Web.Models;
 
 namespace RecipeMatcher.Web.Tests.Ingredients;
 
-public class IngredientsDeleteTests(CustomWebApplicationFactory factory) : IClassFixture<CustomWebApplicationFactory>
+public class IngredientsDeleteTests(CustomWebApplicationFactory factory) : IntegrationTestBase(factory)
 // Zoals (RecipesTests files)
 {
     private async Task<Ingredient> CreateIngredientAsync()
     {
-        var scope = factory.Services.CreateScope();
+        var scope = Factory.Services.CreateScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        await dbContext.Database.EnsureCreatedAsync();
         Ingredient ingredient = new()
         {
             Name = "Basil"
@@ -26,7 +25,7 @@ public class IngredientsDeleteTests(CustomWebApplicationFactory factory) : IClas
     public async Task Get_Delete_ReturnsCorrectResult()
     {
         Ingredient ingredient = await CreateIngredientAsync();
-        var client = factory.CreateClient();
+        var client = Factory.CreateClient();
 
         var response = await client.GetAsync($"/ingredients/delete/{ingredient.Id}");
         string content = await response.Content.ReadAsStringAsync();
@@ -41,12 +40,12 @@ public class IngredientsDeleteTests(CustomWebApplicationFactory factory) : IClas
     public async Task Post_Delete_ReturnsCorrectResult()
     {
         Ingredient ingredient = await CreateIngredientAsync();
-        var client = factory.CreateClient();
+        var client = Factory.CreateClient();
 
         FormUrlEncodedContent formData = new(new Dictionary<string, string> { ["Id"] = ingredient.Id.ToString() });
         await client.PostAsync($"/ingredients/delete/{ingredient.Id}", formData);
 
-        var scope = factory.Services.CreateScope();
+        var scope = Factory.Services.CreateScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         Ingredient? deleted = await dbContext.Ingredients.FindAsync(ingredient.Id);
         Assert.Null(deleted);

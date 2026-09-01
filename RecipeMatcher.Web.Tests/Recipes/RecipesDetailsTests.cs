@@ -5,14 +5,13 @@ using RecipeMatcher.Web.Models;
 
 namespace RecipeMatcher.Web.Tests.Recipes;
 
-public class RecipesDetailsTests(CustomWebApplicationFactory factory) : IClassFixture<CustomWebApplicationFactory>
+public class RecipesDetailsTests(CustomWebApplicationFactory factory) : IntegrationTestBase(factory)
 {
     [Fact]
     public async Task Details_WithExistingId_ReturnsOk()
     {
-        var scope = factory.Services.CreateScope();
+        var scope = Factory.Services.CreateScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        await dbContext.Database.EnsureCreatedAsync();
 
         Recipe recipe = new()
         {
@@ -22,7 +21,7 @@ public class RecipesDetailsTests(CustomWebApplicationFactory factory) : IClassFi
 
         dbContext.Recipes.Add(recipe);
         await dbContext.SaveChangesAsync();
-        var client = factory.CreateClient();
+        var client = Factory.CreateClient();
         var response = await client.GetAsync($"/recipes/details/{recipe.Id}");
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -31,11 +30,7 @@ public class RecipesDetailsTests(CustomWebApplicationFactory factory) : IClassFi
     [Fact]
     public async Task Details_WithUnknownId_ReturnsNotFound()
     {
-        var scope = factory.Services.CreateScope();
-        AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        await dbContext.Database.EnsureCreatedAsync();
-
-        var client = factory.CreateClient();
+        var client = Factory.CreateClient();
         var response = await client.GetAsync("/recipes/details/1");
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
@@ -44,9 +39,8 @@ public class RecipesDetailsTests(CustomWebApplicationFactory factory) : IClassFi
     [Fact]
     public async Task Details_ShowsRelatedIngredients()
     {
-        var scope = factory.Services.CreateScope();
+        var scope = Factory.Services.CreateScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        await dbContext.Database.EnsureCreatedAsync();
 
         Recipe recipe = new() { Name = "Salad", PreparationMinutes = 5 };
         Ingredient ingredient = new() { Name = "Tomatoes" };
@@ -62,7 +56,7 @@ public class RecipesDetailsTests(CustomWebApplicationFactory factory) : IClassFi
         });
         await dbContext.SaveChangesAsync();
 
-        var client = factory.CreateClient();
+        var client = Factory.CreateClient();
         var response = await client.GetAsync($"/recipes/details/{recipe.Id}");
         string content = await response.Content.ReadAsStringAsync();
 

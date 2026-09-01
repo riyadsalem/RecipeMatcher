@@ -6,19 +6,18 @@ using RecipeMatcher.Web.Models;
 
 namespace RecipeMatcher.Web.Tests.Ingredients;
 
-public class IngredientsCreateValidationTests(CustomWebApplicationFactory factory) : IClassFixture<CustomWebApplicationFactory>
+public class IngredientsCreateValidationTests(CustomWebApplicationFactory factory) : IntegrationTestBase(factory)
 // Zoals (RecipesTests files)
 {
     [Fact]
     public async Task Create_WithEmptyName_DoesNotSave()
     {
-        var scope = factory.Services.CreateScope();
+        var scope = Factory.Services.CreateScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        await dbContext.Database.EnsureCreatedAsync();
 
         int countBefore = await dbContext.Ingredients.CountAsync();
 
-        var client = factory.CreateClient();
+        var client = Factory.CreateClient();
         FormUrlEncodedContent formData = new(new Dictionary<string, string>
         {
             ["Name"] = ""
@@ -36,13 +35,12 @@ public class IngredientsCreateValidationTests(CustomWebApplicationFactory factor
     [Fact]
     public async Task Create_WithDuplicateName_DoesNotSave()
     {
-        var scope = factory.Services.CreateScope();
+        var scope = Factory.Services.CreateScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        await dbContext.Database.EnsureCreatedAsync();
         dbContext.Ingredients.Add(new Ingredient { Name = "Salt" });
         await dbContext.SaveChangesAsync();
 
-        var client = factory.CreateClient();
+        var client = Factory.CreateClient();
         FormUrlEncodedContent formData = new(new Dictionary<string, string>
         {
             ["Name"] = "Salt"

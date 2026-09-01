@@ -5,13 +5,12 @@ using RecipeMatcher.Web.Models;
 
 namespace RecipeMatcher.Web.Tests.Recipes;
 
-public class RecipesDeleteTests(CustomWebApplicationFactory factory) : IClassFixture<CustomWebApplicationFactory>
+public class RecipesDeleteTests(CustomWebApplicationFactory factory) : IntegrationTestBase(factory)
 {
     private async Task<Recipe> CreateRecipeAsync()
     {
-        var scope = factory.Services.CreateScope();
+        var scope = Factory.Services.CreateScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        await dbContext.Database.EnsureCreatedAsync();
         Recipe recipe = new Recipe
         {
             Name = "Pasta",
@@ -26,7 +25,7 @@ public class RecipesDeleteTests(CustomWebApplicationFactory factory) : IClassFix
     public async Task Get_Delete_ReturnsCorrectResult()
     {
         Recipe recipe = await CreateRecipeAsync();
-        var client = factory.CreateClient();
+        var client = Factory.CreateClient();
 
         var response = await client.GetAsync($"/recipes/delete/{recipe.Id}");
         string content = await response.Content.ReadAsStringAsync();
@@ -41,12 +40,12 @@ public class RecipesDeleteTests(CustomWebApplicationFactory factory) : IClassFix
     public async Task Post_Delete_ReturnsCorrectResult()
     {
         Recipe recipe = await CreateRecipeAsync();
-        var client = factory.CreateClient();
+        var client = Factory.CreateClient();
 
         FormUrlEncodedContent formData = new(new Dictionary<string, string> { ["Id"] = recipe.Id.ToString() });
         await client.PostAsync($"/recipes/delete/{recipe.Id}", formData);
 
-        var scope = factory.Services.CreateScope();
+        var scope = Factory.Services.CreateScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         Recipe? deleted = await dbContext.Recipes.FindAsync(recipe.Id);
         Assert.Null(deleted);

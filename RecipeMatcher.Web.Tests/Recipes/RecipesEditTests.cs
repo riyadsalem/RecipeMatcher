@@ -5,13 +5,12 @@ using RecipeMatcher.Web.Models;
 
 namespace RecipeMatcher.Web.Tests.Recipes;
 
-public class RecipesEditTests(CustomWebApplicationFactory factory) : IClassFixture<CustomWebApplicationFactory>
+public class RecipesEditTests(CustomWebApplicationFactory factory) : IntegrationTestBase(factory)
 {
     private async Task<Recipe> CreateRecipeAsync()
     {
-        var scope = factory.Services.CreateScope();
+        var scope = Factory.Services.CreateScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        await dbContext.Database.EnsureCreatedAsync();
         Recipe recipe = new()
         {
             Name = "Chicken Curry",
@@ -26,7 +25,7 @@ public class RecipesEditTests(CustomWebApplicationFactory factory) : IClassFixtu
     public async Task Get_Edit_ReturnsCorrectResult()
     {
         Recipe recipe = await CreateRecipeAsync();
-        var client = factory.CreateClient();
+        var client = Factory.CreateClient();
 
         var response = await client.GetAsync($"/recipes/edit/{recipe.Id}");
         string content = await response.Content.ReadAsStringAsync();
@@ -41,7 +40,7 @@ public class RecipesEditTests(CustomWebApplicationFactory factory) : IClassFixtu
     public async Task Post_Edit_HandlesValidAndInvalidData()
     {
         Recipe recipe = await CreateRecipeAsync();
-        var client = factory.CreateClient();
+        var client = Factory.CreateClient();
         FormUrlEncodedContent formData = new(new Dictionary<string, string>
         {
             ["Id"] = recipe.Id.ToString(),
@@ -50,7 +49,7 @@ public class RecipesEditTests(CustomWebApplicationFactory factory) : IClassFixtu
         });
         await client.PostAsync($"/recipes/edit/{recipe.Id}", formData);
 
-        var scope = factory.Services.CreateScope();
+        var scope = Factory.Services.CreateScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         Recipe? updated = await dbContext.Recipes.FindAsync(recipe.Id);
         Assert.Equal("Chicken and rice", updated!.Name);
@@ -71,9 +70,8 @@ public class RecipesEditTests(CustomWebApplicationFactory factory) : IClassFixtu
     [Fact]
     public async Task Get_Edit_MarksLinkedIngredient_AsSelected()
     {
-        var scope = factory.Services.CreateScope();
+        var scope = Factory.Services.CreateScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        await dbContext.Database.EnsureCreatedAsync();
 
         Recipe recipe = new()
         {
@@ -97,7 +95,7 @@ public class RecipesEditTests(CustomWebApplicationFactory factory) : IClassFixtu
         });
         await dbContext.SaveChangesAsync();
 
-        var client = factory.CreateClient();
+        var client = Factory.CreateClient();
         var response = await client.GetAsync($"/recipes/edit/{recipe.Id}");
         string content = await response.Content.ReadAsStringAsync();
 
